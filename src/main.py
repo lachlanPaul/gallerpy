@@ -27,14 +27,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.imgs = []
 
         self.layout = QGridLayout()
+        self.layout.setColumnStretch(0, 50000)
 
         # test, will remove
-        self.add_to_grid(ImageButton(Image("img.png")))
-        self.add_to_grid(ImageButton(Image("img.png")))
-        self.add_to_grid(ImageButton(Image("img.png")))
-        self.add_to_grid(ImageButton(Image("img.png")))
-        self.add_to_grid(ImageButton(Image("as.png")))
-        self.add_to_grid(ImageButton(Image("ha.png")))
+        self.add_to_grid(ImageButton(Image("gorgon.png")))
+        self.add_to_grid(ImageButton(Image("gorgon.png")))
+        self.add_to_grid(ImageButton(Image("gorgon.png")))
+        self.add_to_grid(ImageButton(Image("gorgon.png")))
+        self.add_to_grid(ImageButton(Image("gorgon.png")))
+        self.add_to_grid(ImageButton(Image("capture.jpg")))
 
         widget = QWidget()
         widget.setLayout(self.layout)

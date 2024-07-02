@@ -25,11 +25,20 @@ class ImageButton(QtWidgets.QPushButton):
 
         self.image = image
 
+        max_height = 1000
+        max_width = 1000
+
         pixmap = QtGui.QPixmap(image.pixmap())
+
+        if pixmap.rect().height() > max_height:
+            pixmap = pixmap.scaled(max_height, pixmap.rect().width(), QtCore.Qt.KeepAspectRatio)
+
+        if pixmap.rect().width() > max_width:
+            pixmap = pixmap.scaled(pixmap.rect().height(), max_width, QtCore.Qt.KeepAspectRatio)
+
         icon = QtGui.QIcon(pixmap)
         self.setIcon(icon)
         self.setIconSize(pixmap.rect().size())
-        self.maximumHeight()
         self.setStyleSheet("border: none;")
 
         self.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
