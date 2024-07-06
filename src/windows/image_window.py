@@ -4,11 +4,12 @@
     Lachlan Paul, 2024
 """
 from PySide6 import QtWidgets
+from PySide6.QtWidgets import QWidget
 
-from src.globals import APP, SCREEN_WIDTH, SCREEN_HEIGHT
+from src.globals import SCREEN_WIDTH, SCREEN_HEIGHT, center_window
 
 
-class ImageWindow(QtWidgets.QWidget):
+class ImageWindow(QWidget):
     """
         Window created to display an image
     """
@@ -23,4 +24,6 @@ class ImageWindow(QtWidgets.QWidget):
 
         self.setLayout(self.layout)
         self.resize(int(SCREEN_WIDTH / 2), int(SCREEN_HEIGHT / 3))
+
+        center_window(self)
         self.show()

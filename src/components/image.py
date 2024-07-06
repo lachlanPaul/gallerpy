@@ -5,6 +5,7 @@
 """
 
 from PySide6 import QtWidgets, QtGui, QtCore
+
 from src.windows.image_window import ImageWindow
 
 
@@ -20,21 +21,23 @@ class Image(QtWidgets.QLabel):
 
 
 class ImageButton(QtWidgets.QPushButton):
-    def __init__(self, image: Image):
+    def __init__(self, image: Image, button_height=None, button_width=None):
         super().__init__()
 
         self.image = image
 
-        max_height = 1000
-        max_width = 1000
+        button_height = 500
+        button_width = 500
 
         pixmap = QtGui.QPixmap(image.pixmap())
 
-        if pixmap.rect().height() > max_height:
-            pixmap = pixmap.scaled(max_height, pixmap.rect().width(), QtCore.Qt.KeepAspectRatio)
+        if pixmap.rect().height() > button_height:
+            pixmap = pixmap.scaled(button_height, pixmap.rect().width(), QtCore.Qt.KeepAspectRatio)
 
-        if pixmap.rect().width() > max_width:
-            pixmap = pixmap.scaled(pixmap.rect().height(), max_width, QtCore.Qt.KeepAspectRatio)
+        if pixmap.rect().width() > button_width:
+            pixmap = pixmap.scaled(pixmap.rect().height(), button_width, QtCore.Qt.KeepAspectRatio)
+
+        self.setFixedSize(button_width, button_height)
 
         icon = QtGui.QIcon(pixmap)
         self.setIcon(icon)
