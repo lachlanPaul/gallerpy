@@ -15,6 +15,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
 
+        # TODO: Make theme automatic and changeable in config.
+        #   For some reason I couldn't get pyqtdarktheme to work,
+        #   might have to look into fixing it or finding alternative.
+        APP.setStyle("Fusion")
+
         # These variables are for placing items on the grid, and expanding or shrinking it when the window is resized.
         self.max_columns = 3
         self.current_row = 0
