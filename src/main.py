@@ -3,17 +3,29 @@
 
     Lachlan Paul, 2024
 """
+import json
+import os.path
+import shutil
+
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QGridLayout, QWidget, QScrollArea, QComboBox, QMenuBar, QVBoxLayout
 
 from src.components.image import *
-from src.globals import APP
+from src.globals import APP, CONFIG_FILE, DIRECTORY_FILE, DATA_DIR, CONFIG_PARSER
 from src.windows.directory_manager import DirectoryManagerWindow
 
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.layout = QVBoxLayout()              # The main layout that manages every item in the window.
+        self.menu_bar = QMenuBar()               # The menu bar.
+        self.image_size_drop_down = QComboBox()  # A drop-down menu to.
+        self.image_grid = QGridLayout()          # The grid that holds all the images.
+        self.image_grid_widget = QWidget()       # The widget representation of said grid.
+        self.grid_scroll = QScrollArea()         # The scroll area for the image grid.
+        self.central_widget = QWidget()          # Everything. Has the main layout in it.
 
         # TODO: Make theme automatic and changeable in config.
         #   For some reason I couldn't get pyqtdarktheme to work,
@@ -30,57 +42,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # For some reason, this makes it so you can resize all the time.
         self.setMinimumSize(100, 100)
 
-        self.layout = QVBoxLayout()
-
-        self.menu_bar = QMenuBar()
-        file_menu = self.menu_bar.addMenu("File")
-        add_dir_action = QAction("Add Directory", self)
-
-        # TODO: Find a better way then to have individual methods for each window, probably easy but I'm tired
-        add_dir_action.triggered.connect(self.open_directory_manager)
-
-        file_menu.addAction(add_dir_action)
-        self.setMenuBar(self.menu_bar)
-
-        # TODO: Add functionality, maybe turn into toolbar?
-        # This is the drop-down menu with options to change the image button sizes.
-        self.image_size_drop_down = QComboBox()  # Sounds like something you'd order at KFC tbh.
-
-        # I don't know why it has to be like this.
-        self.image_size_drop_down.setMaximumSize(50, self.image_size_drop_down.maximumSize().height())
-        self.image_size_drop_down.addItems(["1", "2", "3", "4", "5", "6"])
-
-        # The grid that holds all the images.
-        # Changes width based upon the window size, as well as user set image sizes.
-        self.image_grid = QGridLayout()
-        # self.image_grid.setColumnStretch(0, 50000)
-
-        # Puts the grid into a widget, so we can put it in the layout
-        self.image_grid_widget = QWidget()
-        self.image_grid_widget.setLayout(self.image_grid)
-
-        # Test, will remove. Ugly as, but has to be here until I add directory features
-        self.add_to_grid(ImageButton(Image("as.png")))
-        self.add_to_grid(ImageButton(Image("as.png")))
-        self.add_to_grid(ImageButton(Image("as.png")))
-        self.add_to_grid(ImageButton(Image("as.png")))
-        self.add_to_grid(ImageButton(Image("as.png")))
-        self.add_to_grid(ImageButton(Image("ha.png")))
-        self.add_to_grid(ImageButton(Image("ha.png")))
-        self.add_to_grid(ImageButton(Image("img_1.png")))
-
-        # This is the scroll menu that the image grid will preside in.
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setWidget(self.image_grid_widget)
-
-        # The central widget is literally everything.
-        self.central_widget = QWidget()
-        self.central_widget.setLayout(self.layout)
-        self.setCentralWidget(self.central_widget)
-
-        self.layout.addWidget(self.image_size_drop_down)
-        self.layout.addWidget(self.scroll_area)
+        self.load_data()
+        self.setup_ui()
+        self.get_images()
 
         self.showMaximized()
 
@@ -103,10 +67,54 @@ class MainWindow(QtWidgets.QMainWindow):
             widget.setParent(None)
 
     def get_images(self):
+        # self.draw_images(path)
         pass
 
-    def draw_images(self):
-        pass
+    def draw_images(self, path):
+        for i in os.listdir(path):
+            self.add_to_grid(ImageButton(Image(os.path.join(path, i))))
+
+    def load_data(self):
+        """
+            Loads config data.
+        """
+        if not os.path.exists(DATA_DIR):
+            os.mkdir(DATA_DIR)
+        if not os.path.exists(CONFIG_FILE):
+            shutil.copy("config.ini", CONFIG_FILE)
+        if not os.path.exists(DIRECTORY_FILE):
+            with open(DIRECTORY_FILE, "w") as file:
+                json.dump({}, file)
+
+        CONFIG_PARSER.read(CONFIG_FILE)
+
+    def setup_ui(self):
+
+        file_menu = self.menu_bar.addMenu("File")
+        add_dir_action = QAction("Add Directory", self)
+
+        # TODO: Find a better way then to have individual methods for each window, probably easy but I'm tired
+        add_dir_action.triggered.connect(self.open_directory_manager)
+
+        file_menu.addAction(add_dir_action)
+        self.setMenuBar(self.menu_bar)
+
+        # TODO: Add functionality
+        # I don't know why it has to be like this.
+        self.image_size_drop_down.setMaximumSize(50, self.image_size_drop_down.maximumSize().height())
+        self.image_size_drop_down.addItems(["1", "2", "3", "4", "5", "6"])
+
+        # Puts the grid into a widget, so we can put it in the layout
+        self.image_grid_widget.setLayout(self.image_grid)
+
+        self.grid_scroll.setWidgetResizable(True)
+        self.grid_scroll.setWidget(self.image_grid_widget)
+
+        self.central_widget.setLayout(self.layout)
+        self.setCentralWidget(self.central_widget)
+
+        self.layout.addWidget(self.image_size_drop_down)
+        self.layout.addWidget(self.grid_scroll)
 
 
 if __name__ == "__main__":
