@@ -89,7 +89,6 @@ class MainWindow(QtWidgets.QMainWindow):
         CONFIG_PARSER.read(CONFIG_FILE)
 
     def setup_ui(self):
-
         file_menu = self.menu_bar.addMenu("File")
         add_dir_action = QAction("Add Directory", self)
 

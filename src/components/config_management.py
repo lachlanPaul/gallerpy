@@ -9,10 +9,10 @@ import os
 from src.globals import DIRECTORY_FILE
 
 
-def add_dir(dir: str):
+def add_dir(dir_to_add: str):
     with open(DIRECTORY_FILE, "r") as file:
         data = json.load(file)
-    dir_to_add = {os.path.basename: dir}
+    dir_to_add = {os.path.basename: dir_to_add}
     data.update(dir_to_add)
 
     with open(DIRECTORY_FILE, 'w') as file:
