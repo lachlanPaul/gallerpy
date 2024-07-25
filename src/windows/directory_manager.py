@@ -35,5 +35,5 @@ class DirectoryManagerWindow(QtWidgets.QMainWindow):
         dir_select = QFileDialog()
         dir_select.setFileMode(QFileDialog.FileMode.Directory)
         dir_to_add = dir_select.getExistingDirectory(self, "Add Directory")
-        add_dir(dir_to_add)
+        add_dir(dir_to_add, False)
 

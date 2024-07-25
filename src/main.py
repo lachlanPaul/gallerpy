@@ -44,7 +44,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.load_data()
         self.setup_ui()
-        self.get_images()
+        paths = self.get_images()
+        self.draw_images(paths)
 
         self.showMaximized()
 
@@ -67,12 +68,37 @@ class MainWindow(QtWidgets.QMainWindow):
             widget.setParent(None)
 
     def get_images(self):
-        # self.draw_images(path)
-        pass
+        paths_to_use = []  # Eventually will be filled with all the paths to be loaded
 
-    def draw_images(self, path):
-        for i in os.listdir(path):
-            self.add_to_grid(ImageButton(Image(os.path.join(path, i))))
+        with open(DIRECTORY_FILE, "r") as file:
+            data = json.load(file)
+
+            # Gets directory and if subdirectories are included with it
+            include_sub_dirs_status = {
+                dir_info.get("Location"): dir_info.get("Include Sub Directories", False)
+                for dir_name, dir_info in data["Directories"].items()
+            }
+            for dir_loc, incl_sub, in include_sub_dirs_status.items():
+                paths_to_use.append(dir_loc)
+                if incl_sub:
+                    for i, j, y in os.walk(dir_loc):
+                        # TODO: Add a pop up confirming that the user wants to continue for every 5-10 sub dirs added
+                        #  Just so they don't add up too much and slow stuff down if they add a large dir by accident
+                        paths_to_use.append(i)
+
+            # By converting the list to a dict and back, we remove any duplicate directories
+            return list(dict.fromkeys(paths_to_use))
+
+    def draw_images(self, list_of_dir):
+        """
+            Draws all the images to the main grid.
+            :param list_of_dir: A list of directories in string form. Usually the paths_to_use list made by get_images()
+        """
+        for i in list_of_dir:
+            if isinstance(i, str):
+                for img in os.listdir(i):
+                    if img.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                        self.add_to_grid(ImageButton(Image(os.path.join(i, img))))
 
     def load_data(self):
         """
@@ -84,13 +110,13 @@ class MainWindow(QtWidgets.QMainWindow):
             shutil.copy("config.ini", CONFIG_FILE)
         if not os.path.exists(DIRECTORY_FILE):
             with open(DIRECTORY_FILE, "w") as file:
-                json.dump({}, file)
+                json.dump({"Directories": {}}, file)
 
         CONFIG_PARSER.read(CONFIG_FILE)
 
     def setup_ui(self):
         file_menu = self.menu_bar.addMenu("File")
-        add_dir_action = QAction("Add Directory", self)
+        add_dir_action = QAction("Manage Directories", self)
 
         # TODO: Find a better way then to have individual methods for each window, probably easy but I'm tired
         add_dir_action.triggered.connect(self.open_directory_manager)
